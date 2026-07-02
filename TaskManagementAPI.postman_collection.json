@@ -1,0 +1,378 @@
+{
+  "info": {
+    "name": "Task Management API",
+    "description": "Postman collection for Task Management API - includes Auth (Register/Login) and Task CRUD endpoints with JWT authentication.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5006",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "JWT token. Auto-filled after Login or Register request."
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Public endpoints for user registration and login.",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.success && json.data && json.data.token) {",
+                  "    pm.collectionVariables.set('token', json.data.token);",
+                  "    console.log('Token saved from Register.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Adith Ravindran\",\n  \"email\": \"adith@example.com\",\n  \"password\": \"Pass@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new user. On success, the JWT token is automatically saved to the `token` collection variable."
+          },
+          "response": [
+            {
+              "name": "201 - Registered Successfully",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"statusCode\": 200,\n  \"message\": \"User registered successfully.\",\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"expiration\": \"2025-07-02T12:00:00Z\",\n    \"email\": \"adith@example.com\",\n    \"fullName\": \"Adith Ravindran\"\n  }\n}"
+            },
+            {
+              "name": "409 - Email Already Exists",
+              "status": "Conflict",
+              "code": 409,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"statusCode\": 409,\n  \"message\": \"A user with this email already exists.\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.success && json.data && json.data.token) {",
+                  "    pm.collectionVariables.set('token', json.data.token);",
+                  "    console.log('Token saved from Login.');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"adith@example.com\",\n  \"password\": \"Pass@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login with email and password. On success, the JWT token is automatically saved to the `token` collection variable."
+          },
+          "response": [
+            {
+              "name": "200 - Login Successful",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"statusCode\": 200,\n  \"message\": \"Login successful.\",\n  \"data\": {\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"expiration\": \"2025-07-02T12:00:00Z\",\n    \"email\": \"adith@example.com\",\n    \"fullName\": \"Adith Ravindran\"\n  }\n}"
+            },
+            {
+              "name": "401 - Invalid Credentials",
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"statusCode\": 401,\n  \"message\": \"Invalid email or password.\",\n  \"data\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "description": "Protected task endpoints. Requires a valid JWT Bearer token.",
+      "item": [
+        {
+          "name": "Get All Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?pageNumber=1&pageSize=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Pending",
+                  "description": "Filter by status: Pending | Completed | Expired",
+                  "disabled": true
+                },
+                {
+                  "key": "pageNumber",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10",
+                  "description": "Items per page (default: 10, max: 100)"
+                }
+              ]
+            },
+            "description": "Get all tasks sorted by DueDate. Optionally filter by status (Pending, Completed, Expired) and paginate."
+          },
+          "response": [
+            {
+              "name": "200 - Tasks Retrieved",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"statusCode\": 200,\n  \"message\": \"Tasks retrieved successfully.\",\n  \"data\": {\n    \"data\": [\n      {\n        \"id\": 1,\n        \"title\": \"Complete project report\",\n        \"description\": \"Write and submit the final report\",\n        \"dueDate\": \"2025-12-31T18:00:00Z\",\n        \"status\": \"Pending\",\n        \"createdAt\": \"2025-07-02T10:00:00Z\",\n        \"updatedAt\": \"2025-07-02T10:00:00Z\"\n      }\n    ],\n    \"pageNumber\": 1,\n    \"pageSize\": 10,\n    \"totalCount\": 1,\n    \"totalPages\": 1,\n    \"hasPreviousPage\": false,\n    \"hasNextPage\": false\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Tasks - Filter by Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?status=Pending&pageNumber=1&pageSize=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Pending",
+                  "description": "Filter by status: Pending | Completed | Expired"
+                },
+                {
+                  "key": "pageNumber",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Get tasks filtered by status. Change `status` value to Pending, Completed, or Expired."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Task by Id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "1"]
+            },
+            "description": "Get a single task by its Id. Replace `1` with the actual task Id."
+          },
+          "response": [
+            {
+              "name": "200 - Task Found",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"statusCode\": 200,\n  \"message\": \"Task retrieved successfully.\",\n  \"data\": {\n    \"id\": 1,\n    \"title\": \"Complete project report\",\n    \"description\": \"Write and submit the final report\",\n    \"dueDate\": \"2025-12-31T18:00:00Z\",\n    \"status\": \"Pending\",\n    \"createdAt\": \"2025-07-02T10:00:00Z\",\n    \"updatedAt\": \"2025-07-02T10:00:00Z\"\n  }\n}"
+            },
+            {
+              "name": "404 - Task Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"statusCode\": 404,\n  \"message\": \"Task with Id 1 not found.\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Complete project report\",\n  \"description\": \"Write and submit the final report\",\n  \"dueDate\": \"2025-12-31T18:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"]
+            },
+            "description": "Create a new task. Title is required. DueDate must be a future UTC datetime. Status defaults to Pending."
+          },
+          "response": [
+            {
+              "name": "201 - Task Created",
+              "status": "Created",
+              "code": 201,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"statusCode\": 201,\n  \"message\": \"Task created successfully.\",\n  \"data\": {\n    \"id\": 1,\n    \"title\": \"Complete project report\",\n    \"description\": \"Write and submit the final report\",\n    \"dueDate\": \"2025-12-31T18:00:00Z\",\n    \"status\": \"Pending\",\n    \"createdAt\": \"2025-07-02T10:00:00Z\",\n    \"updatedAt\": \"2025-07-02T10:00:00Z\"\n  }\n}"
+            },
+            {
+              "name": "400 - DueDate in Past",
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"statusCode\": 400,\n  \"message\": \"DueDate cannot be in the past.\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "400 - Missing Title",
+              "status": "Bad Request",
+              "code": 400,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"statusCode\": 400,\n  \"message\": \"Title is mandatory.\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated task title\",\n  \"description\": \"Updated description\",\n  \"dueDate\": \"2025-11-30T12:00:00Z\",\n  \"status\": \"Completed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "1"]
+            },
+            "description": "Update an existing task. All fields are optional — only provide the ones you want to update. Replace `1` with the actual task Id. Status values: Pending | Completed | Expired."
+          },
+          "response": [
+            {
+              "name": "200 - Task Updated",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"statusCode\": 200,\n  \"message\": \"Task updated successfully.\",\n  \"data\": {\n    \"id\": 1,\n    \"title\": \"Updated task title\",\n    \"description\": \"Updated description\",\n    \"dueDate\": \"2025-11-30T12:00:00Z\",\n    \"status\": \"Completed\",\n    \"createdAt\": \"2025-07-02T10:00:00Z\",\n    \"updatedAt\": \"2025-07-02T11:00:00Z\"\n  }\n}"
+            },
+            {
+              "name": "404 - Task Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"statusCode\": 404,\n  \"message\": \"Task with Id 1 not found.\",\n  \"data\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "1"]
+            },
+            "description": "Delete a task by Id. Replace `1` with the actual task Id."
+          },
+          "response": [
+            {
+              "name": "200 - Task Deleted",
+              "status": "OK",
+              "code": 200,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": true,\n  \"statusCode\": 200,\n  \"message\": \"Task deleted successfully.\",\n  \"data\": null\n}"
+            },
+            {
+              "name": "404 - Task Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "header": [{ "key": "Content-Type", "value": "application/json" }],
+              "body": "{\n  \"success\": false,\n  \"statusCode\": 404,\n  \"message\": \"Task with Id 1 not found.\",\n  \"data\": null\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
