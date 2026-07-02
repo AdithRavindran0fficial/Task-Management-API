@@ -1,0 +1,123 @@
+# ========================
+# .NET
+# ========================
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ========================
+# ASP.NET Core
+# ========================
+**/wwwroot/lib/
+**/appsettings.Development.json
+
+# ========================
+# Build Results
+# ========================
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# ========================
+# Visual Studio
+# ========================
+.vs/
+*.rsuser
+*.vsp
+*.vspx
+*.sap
+*.cache
+*.ilk
+*.map
+*.exp
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# ========================
+# NuGet
+# ========================
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+project.assets.json
+packages.lock.json
+NuGet.Config
+
+# ========================
+# Rider / JetBrains
+# ========================
+.idea/
+*.sln.iml
+
+# ========================
+# OS Generated
+# ========================
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+
+# ========================
+# Environment & Secrets
+# ========================
+.env
+.env.*
+appsettings.Local.json
+**/secrets.json
+
+# ========================
+# Test Results
+# ========================
+TestResults/
+[Tt]est[Rr]esult*/
+*.trx
+*.coveragexml
+coverage*/
